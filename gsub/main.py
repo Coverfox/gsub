@@ -23,19 +23,21 @@ def locate_git():
 
 
 def show_help():
-    print("""usage: gsub [--version] [--help] <command> <args>
+    print(
+        """usage: gsub [--version] [--help] <command> <args>
 
 Commands:
 
   list          List all gsub folders.
   freeze        Update gsub files based on content of managed folders.
   update        Create/update managed folders based on gsub files.
-  vendor PATH   Add a new gsub file.""")
+  vendor PATH   Add a new gsub file."""
+    )
     sys.exit(1)
 
 
 def show_version():
-    print("gsub: v0.1.4")
+    print("gsub: v0.1.5")
     raise SystemExit
 
 
@@ -114,7 +116,7 @@ def handle_list(root):
         print("No .gsub files found in %s." % root)
         return
 
-    maxsize = max(len(x[0]) for x in output)+1
+    maxsize = max(len(x[0]) for x in output) + 1
     for x in output:
         print(("%-" + str(maxsize) + "s   %s") % (x[0] + ":", x[1]))
         print(("%-" + str(maxsize) + "s   Expected: %s@%s.") % ("", x[2], x[3][:10]))
@@ -147,9 +149,7 @@ def update_it(folder, name):
             return "Error: failed to git url (%s)." % cgit
 
         if cgit != git:
-            print(
-                "%s contains %s, expected %s, what to do?" % (rel, cgit, git)
-            )
+            print("%s contains %s, expected %s, what to do?" % (rel, cgit, git))
             if six.moves.input("Nuke %s [y/N]: " % fbase).lower() == "y":
                 try:
                     shutil.rmtree(fbase)
@@ -187,11 +187,7 @@ def update_it(folder, name):
             return rel, "Error: could not checkout (%s)." % err.strip()
         return rel, "Cloned %s @%s, latest was %s." % (git, commit, version)
 
-    print(
-        "%s contains version %s, expected %s, what to do?" % (
-            rel, version, commit
-        )
-    )
+    print("%s contains version %s, expected %s, what to do?" % (rel, version, commit))
 
     if six.moves.input("Checkout %s [y/N]: " % commit).lower() == "y":
         err, code = o(fbase, "git fetch")
@@ -227,7 +223,7 @@ def handle_update(root):
 def handle_vendor(pth):
     pth = pth.rstrip("/")
 
-    dst = ("vendor/src/%s" % pth)
+    dst = "vendor/src/%s" % pth
     print("mkdir -p", dst)
     dstdad = dst.rsplit("/", 1)[0]
 
@@ -236,10 +232,7 @@ def handle_vendor(pth):
     print(dstdad, pth, giturl, gclone)
 
     if not os.path.isdir("./vendor/src/"):
-        print(
-            "There is no vendor folder in this directory. "
-            "Do I create it? (y/N) "
-        )
+        print("There is no vendor folder in this directory. " "Do I create it? (y/N) ")
 
         if six.moves.input().lower() != "y":
             sys.exit(1)
@@ -292,7 +285,8 @@ def main():
     root = locate_git()
     if not root:
         print("not a git repo")
-        return
+        root = os.getcwd()
+        print("running in path: " + str(root))
 
     if first == "list":
         handle_list(root)
@@ -307,5 +301,7 @@ def main():
         second = sys.argv[2].replace("https://", "")
         handle_vendor(second)
 
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     main()
